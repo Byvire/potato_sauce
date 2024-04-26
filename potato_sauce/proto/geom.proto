@@ -1,0 +1,36 @@
+// Messages for storage of geometric objects.
+// Except as noted, runtime use of these objects should be avoided in favor of
+// the corresponding classes in geometry2d.py, which have `from_proto` factory
+// methods and `to_proto` instance methods.
+
+syntax = "proto3";
+
+package potato_sauce.geom;
+
+
+// See geometry2d.GridCoord.
+message GridCoord {
+  int64 x = 1;
+  int64 y = 2;
+}
+
+
+// See geometry2d.Gridtangle.
+message Gridtangle {
+  GridCoord bottom_left = 1;
+  GridCoord top_right = 2;
+}
+
+
+// Represents a cardinal direction, for cases where the safety of comparing
+// enum values trumps the flexibility of using a Vector or GridDisplacement.
+//
+// Values may be decoded as unit-size geometry2d.Vector or
+// geometry2d.GridDisplacement objects, depending on context.
+enum Direction {
+  DIRECTION_UNKNOWN = 0;
+  DIRECTION_UP = 1;
+  DIRECTION_DOWN = 2;
+  DIRECTION_LEFT = 3;
+  DIRECTION_RIGHT = 4;
+}

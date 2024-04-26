@@ -1,0 +1,277 @@
+// Rectangle maze. Simple puzzle game where you navigate a rectangular tessellation.
+// Experimental.
+
+syntax = "proto3";
+
+import "potato_sauce/proto/geom.proto";
+import "potato_sauce/proto/mondrian.proto";
+
+package potato_sauce.mazetangle;
+
+
+message Maze {
+  repeated potato_sauce.geom.Gridtangle rects = 1;
+  // The rectangles in rects are the visible tiles in the level drawing,
+  // in up-and-right-are-positive int coordinates with the bottom left pixel of
+  // the background image being bounding_box.bottom_left.
+  //
+  // Note there's a one-pixel gap for the border between tiles that are
+  // "touching".
+  Graphic background = 2;
+  potato_sauce.geom.Gridtangle start = 3;
+  potato_sauce.geom.Gridtangle goal = 4;
+  // Boundaries of the level. Will be used as the screen size.
+  potato_sauce.geom.Gridtangle bounding_box = 5;
+  ParInfo par_info = 6;
+  // Colors for dynamic game objects.
+  ColorInfo color = 7;
+  Graphic colorblind_background = 8;
+  ColorInfo colorblind_color = 9;
+  // Metrics used to determine whether this maze is interesting.
+  MazeQuality quality = 10;
+}
+
+
+message Graphic {
+  string img_path = 1;  // Asset path.
+  potato_sauce.geom.GridCoord bottom_left = 2;
+}
+
+// Data used to tell the user how they did. "Par" as in "expected score", in
+// the golf sense.
+message ParInfo {
+  // NB: storing both the paths and their lengths is redundant but convenient.
+
+  // Length of the shortest possible path from the start to the goal node.
+  // The shortest possible is 2, a path consisting of just [start, end].
+  int32 shortest_path_length = 1;
+  // Length of the longest path from the start to the goal node.
+  // Similar to shortest_path_length in interpretation, except it may be set to
+  // zero if we were unable to compute the longest path. (It's NP-hard.)
+  int32 longest_path_length = 2;
+  // Value of the shortest path. At index 0 is the value of `Maze.start`, and at
+  // index -1 is the value of `Maze.goal`.
+  //
+  // In the JSON, this is represented as a list of indices into `Maze.rects`,
+  // because the javascript game relies on object reference identity.
+  repeated potato_sauce.geom.Gridtangle shortest_path = 3;
+  // Value of the longest path, or empty list if it could not be computed.
+  //
+  // Similar in form to `shortest_path`. Likewise, in the JSON it is a list of
+  // indices.
+  repeated potato_sauce.geom.Gridtangle longest_path = 4;
+}
+
+
+// Deprecated top-level config with parameters from which Mazes can be generated.
+// See LevelBatchConfig / MazeGeometryConfig instead.
+message MazeGenConfig {
+  potato_sauce.mondrian.SceneSpec scene = 1;
+  // Colors of static content (background rectangles) are configured by the
+  // SceneSpec, but colors that change at runtime are configured by
+  // dynamic_colors.
+  ColorInfo dynamic_colors = 2;
+}
+
+// A color scheme for a mazetangle level. Used both for level generation and at
+// runtime.
+message ColorInfo {
+  // All colors should be in the format "#12abef". Some colors are passed
+  // through verbatim to the JS layer, and others are interpreted by Python.
+
+  // Color of the rectangle where the player currently is.
+  string current_node_color = 1;
+  // Color of the rectangles the player has passed through.
+  string path_color = 2;
+
+  // Colors of tiles in the level's background.
+  repeated string tile_colors = 3;
+  // Color of the border that separates the level's tiles.
+  string border_color = 4;
+  // Color of the short animation that plays when the user attempts to make an
+  // invalid move. The border of the current tile is briefly colored with this
+  // base color.
+  string invalid_move_base_color = 5;
+  // As part of the same invalid-move animation, the places where the current
+  // tile is not touching another tile are highlighted in this color.
+  string invalid_move_highlight_color = 6;
+  // The colors that the goal square cycles between. Length must be at least 1.
+  // TODO: The color-changing goal tile is no longer implemented in the JS
+  // game, so this should be replaced with a singular goal_color field.
+  repeated string goal_color_cycle = 7;
+}
+
+// A group of color palettes that can be used for the same type of level.
+message ColorPool {
+  // Identifies this pool.
+  string name = 1;
+  // One or more color palettes. Selected uniformly at random when making a
+  // level with this color pool.
+  repeated ColorInfo palettes = 2;
+  // Default colors that are shared by all palettes in this pool. If a field in
+  // a palette is unset (or empty string), the default value is used.
+  ColorInfo defaults = 3;
+}
+
+
+// Configures level generation for a homogeneous box of
+message StandardBoxLevelGen {
+  // Width and height of the generated level.
+  // NB if using scaling, these are the pre-scaling dimensions.
+  int32 width = 3;
+  int32 height = 4;
+  // Target rectangle widths and heights. See mondrian.TilingConfig.edge_sizes
+  // for caveats.
+  repeated int32 edge_sizes = 5;
+  // Mutually exlusive alternative to edge_sizes. Same semantics as
+  // mondrian.TilingConfig.edge_size_combinations.
+  repeated mondrian.RectTargetSize edge_size_combinations = 8;
+
+  // Like mondrian.SceneSpec.scale_by, this causes the level to be scaled up in
+  // resolution before being drawn. The tile borders are 1px thick in the final
+  // resolution.
+  int32 scale_by = 6;
+  mondrian.ThinRectStrategy thin_rect_strategy = 7;
+}
+
+
+// Parameters for the layout of a mazetangle level.
+// Also indicates what ColorPool to use, so layout and color can be coordinated
+// if need be.
+message MazeGeometryConfig {
+  // Identifies this pool of MazeGenConfigs.
+  string name = 1;
+  // Which set of colors the generated levels should be painted, identified by
+  // ColorPool.name. (X-ref to different part of LevelBatchConfig.)
+  string color_pool = 2;
+  // Similar, colorblind variant colors.
+  string colorblind_color_pool = 3;
+  // The important part, all the info about how the level should be laid out.
+  oneof config {
+    StandardBoxLevelGen standard_box_level = 4;
+    // TODO: More weird types of level.
+  }
+  repeated MazeFilter filters = 10;
+}
+
+
+// A filter that helps decide whether a level is worthy of our wonderful users.
+//
+// The filter defines a predicate that, if true, means the maze is bad.
+message MazeFilter {
+  // Note to self: Do not build a new Lisp.
+
+  // Action is deprectated and ignored. All filters are treated as EXCLUDE.
+  enum Action {
+    ACTION_UNKNOWN = 0;  // IGNORED
+    INCLUDE = 1;  // IGNORED
+    EXCLUDE = 2;  // IGNORED
+  }
+
+  enum Quantity {
+    QUANTITY_UNKNOWN = 0;  // not allowed
+    // Length of the shortest path in terms of number of steps. (So at least 1.
+    // In terms of tiles it would be at least 2.)
+    SHORTEST_PATH_STEPS = 1;
+    // The shortest path but skipping consecutive moves in the same direction.
+    // In terms of number of steps, not number of tiles.
+    COMPRESSED_SHORTEST_PATH_STEPS = 2;
+    // Length of the longest path in terms of number of tiles. So at least 1,
+    // but 0 if the computation timed out.
+    LONGEST_PATH_STEPS = 3;
+    // The longest path but skipping consecutive moves in the same direction.
+    // (Still 0 if the computation timed out.)
+    COMPRESSED_LONGEST_PATH_STEPS = 4;
+    // len(shortest) + len(longest)
+    // - 2 * len(longest_common_subsequence(shortest, longest))
+    SHORTEST_LONGEST_EDIT_DISTANCE = 5;
+    // 1 if longest path computation timed out, 0 if not.
+    LONGEST_PATH_TIMED_OUT = 6;
+    // min(width, height) of the bounding box containing all reachable tiles.
+    REACHABLE_BOUNDING_BOX_MINOR_AXIS_LENGTH = 7;
+    // Number of tiles in the level that are unreachable from the start tile.
+    UNREACHABLE_TILE_COUNT = 8;
+    // Let S be the union of the tiles in the longest and shortest paths, minus
+    // the start and goal tiles. This is the min(width, height) of the bounding
+    // box of S.
+    SOLUTION_BOUNDING_BOX_MINOR_AXIS_LENGTH = 9;
+    // Total number of tiles in the maze, including unreachable tiles.
+    TILE_COUNT = 10;
+    // Greatest width*height of any tile in the level.
+    MAX_TILE_AREA = 11;
+    // Total number of tiles minus the number of tiles in the longest path.
+    TILES_NOT_IN_LONGEST_PATH = 12;
+    // Percent of tiles that are in the longest path (including start and goal),
+    // rounded down to the nearest percent. (Value from 0 to 100.)
+    TILES_IN_LONGEST_PATH_PERCENT = 13;
+
+    // TODO: Add a quality metric to detect if a mindless Zamboni strategy can
+    // solve the level. Those levels make me irrationally angry.
+  }
+
+  enum Relation {
+    RELATION_UNKNOWN = 0;  // not allowed
+    GREATER_THAN = 1;
+    LESS_THAN = 2;
+  }
+
+  // Build an expression of the form: quantity relation value.
+  // For example SHORTEST_PATH_LENGTH LESS_THAN 8
+  // means the filter applies when shortest path length < 8.
+  Quantity quantity = 3;
+  Relation relation = 4;
+  int32 value = 5;
+
+  // Deprecation zone! Look not here!
+  Action action = 1;  // Deprecated and ignored
+  int32 priority = 2;  // Deprecated and ignored.
+}
+
+message MazeQuality {
+  // See MazeFilter.Quantity for the meanings of these values.
+  // The field numbers should match between corresponding values in these protos.
+  int32 shortest_path_steps = 1;
+  int32 compressed_shortest_path_steps = 2;
+  int32 longest_path_steps = 3;
+  int32 compressed_longest_path_steps = 4;
+  int32 shortest_longest_edit_distance = 5;
+  int32 longest_path_timed_out = 6;  // int for consistency
+  int32 reachable_bounding_box_minor_axis_length = 7;
+  int32 unreachable_tile_count = 8;
+  int32 solution_bounding_box_minor_axis_length = 9;
+  int32 tile_count = 10;
+  int32 max_tile_area = 11;
+  int32 tiles_not_in_longest_path = 12;
+  int32 tiles_in_longest_path_percent = 13;
+}
+
+// Configuration for one of the user-visible categories of mazetangle levels, ie
+// the big navigation options at the top of the page.
+message MazeVariantSpec {
+  // Name of the variant, also used as the data subdirectory name.
+  // See LevelVariant.model.ts for possible values, e.g. "daily", "small",
+  // "large".
+  string name = 1;
+  // Groups of same-geometry levels, probably in order from lower to higher
+  // difficulty.
+  repeated SubVariantSpec level_groups = 4;
+
+  reserved 2, 3;
+}
+
+message SubVariantSpec {
+  // Which geometry to base the levels on. (X-ref to LevelBatchConfig.geometries via MazeGeometryConfig.name.
+  // Each level created will be based on one of the named MazeGeometryConfigs,
+  // chosen uniformly at random. (X-ref to different part of LevelBatchConfig.)
+  string geometry_name = 1;
+  // Number of levels to create.
+  int32 level_count = 2;
+}
+
+
+// Full top-level config for generating a batch of mazetangle levels.
+message LevelBatchConfig {
+  repeated MazeVariantSpec variants = 1;
+  repeated MazeGeometryConfig geometries = 2;
+  repeated ColorPool color_pools = 3;
+}

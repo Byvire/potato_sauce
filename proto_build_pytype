@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# This script builds the potato_sauce protos in a way that allows typechecking
+# with Pytype but crashes at runtime.
+# See https://github.com/google/pytype/issues/1590
+
+protoc -I=. --python_out=. --pyi_out=. potato_sauce/proto/*.proto
+
+for pb2_file in $(ls potato_sauce/proto/*_pb2.py) ; do
+    if [[ -f "${pb2_file}"i ]] ; then
+        merge-pyi -i "${pb2_file}" "${pb2_file}"i
+        rm "${pb2_file}"i
+    fi
+done
