@@ -1,0 +1,31 @@
+// Protos for the "Jomp" platforming demo.
+//
+// This is used only by code in the potato_sauce/experiment directory.
+// It lives here for ease of compilation.
+
+syntax = "proto3";
+
+package potato_sauce.jomp;
+
+import "potato_sauce/proto/geom.proto";
+
+
+message LevelConfig {
+  // Path (in asset dir) to ascii art defining this level's colliders, as one 8x8 pixel cell per letter.
+  // See for example assets/roboskater_demo/simple_map.txt.
+  string ascii_file = 1;
+  repeated RuleZone rule_zones = 2;
+}
+
+// RuleZone is a grouping of seemingly unrelated things, which are represented
+// graphically all the same way.
+message RuleZone {
+  // Location is given in terms of pixel coordinates.
+  potato_sauce.geom.Gridtangle location = 1;
+  // Optionally configures gravity values. DIRECTION_UNKNOWN (the default) is
+  // interpreted as downward gravity.
+  potato_sauce.geom.Direction gravity_direction = 2;
+  // Which player controls the character in this zone?
+  // Players are numbered from 0 and there are probably only two of them.
+  int32 player = 3;
+}

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-protoc -I=. --python_out=. --pyi_out=. potato_sauce/proto/*.proto
+protoc -I=. --python_out=. --pyi_out=. potato_sauce/proto/*.proto potato_sauce/proto/experiment/*.proto

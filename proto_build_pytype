@@ -4,9 +4,9 @@
 # with Pytype but crashes at runtime.
 # See https://github.com/google/pytype/issues/1590
 
-protoc -I=. --python_out=. --pyi_out=. potato_sauce/proto/*.proto
+protoc -I=. --python_out=. --pyi_out=. potato_sauce/proto/*.proto potato_sauce/proto/experiment/*.proto
 
-for pb2_file in $(ls potato_sauce/proto/*_pb2.py) ; do
+for pb2_file in $(ls potato_sauce/proto/*_pb2.py potato_sauce/proto/experiment/*_pb2.py) ; do
     if [[ -f "${pb2_file}"i ]] ; then
         merge-pyi -i "${pb2_file}" "${pb2_file}"i
         rm "${pb2_file}"i
