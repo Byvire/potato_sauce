@@ -31,6 +31,16 @@ message Maze {
   MazeQuality quality = 10;
 }
 
+// // Subjective measure of the difficulty of the maze.
+// //
+// // We tell the user how hard the maze is supposed to be, to reassure them the
+// // experience they're having is normal and okay.
+// enum Difficulty {
+//   DIFFICULTY_UNKNOWN = 0;  // Do not use, default proto enum value.
+//   DIFFICULTY_BEGINNER = 1;
+//   DIFFICULTY_INTERMEDIATE = 2;
+//   DIFFICULTY_EXPERT = 3;
+// }
 
 message Graphic {
   string img_path = 1;  // Asset path.
@@ -255,6 +265,8 @@ message MazeVariantSpec {
   // Groups of same-geometry levels, probably in order from lower to higher
   // difficulty.
   repeated SubVariantSpec level_groups = 4;
+  // Information about this maze category, used by the game frontend.
+  VariantMetadata metadata = 5;
 
   reserved 2, 3;
 }
@@ -263,9 +275,38 @@ message SubVariantSpec {
   // Which geometry to base the levels on. (X-ref to LevelBatchConfig.geometries via MazeGeometryConfig.name.
   // Each level created will be based on one of the named MazeGeometryConfigs,
   // chosen uniformly at random. (X-ref to different part of LevelBatchConfig.)
-  string geometry_name = 1;
+  repeated string geometry_names = 1;
   // Number of levels to create.
   int32 level_count = 2;
+  // // Optional short description that displays to the user when they load a maze.
+  // // Suggested values are "beginner", "intermediate", and "expert", to reassure
+  // // the user the experience they're having is normal.
+  // // TODO: Where should this be? I think on the geometry level is best
+  // string description = 3;
+}
+
+// Information about a level variant, to help the JS game/site display
+// appropriate text at the right times.
+//
+// The JSON version of this has extra fields that are documented in
+// LevelVariantMetadata.model.ts.
+message VariantMetadata {
+  // Canonical mazetangle.com URL tag for this variant, ie the part after the #
+  // in the URL. For example, if your levels are at mazetangle.com/#foo then
+  // your URL tag is "foo".
+  //
+  // Tags are case insensitive but the capitalization here will be used by
+  // default. (So please use lowercase.)
+  string url_tag = 1;
+  // Name to be used in a context where capitalization makes sense, such as a
+  // nav button. This should be a noun or noun phrase, like "Daily Triptych"
+  // or "Extra Mazes".
+  string title_phrase = 2;
+  // The end of the sentence starting with "You've completed ".
+  // For example, "today's triptych" or "this week's extra levels".
+  // Use a simple noun phrase, don't get weird, because this may be used in
+  // other contexts as well.
+  string you_have_completed_phrase = 3;
 }
 
 

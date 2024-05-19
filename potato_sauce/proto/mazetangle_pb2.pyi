@@ -209,20 +209,32 @@ class MazeQuality(_message.Message):
     def __init__(self, shortest_path_steps: _Optional[int] = ..., compressed_shortest_path_steps: _Optional[int] = ..., longest_path_steps: _Optional[int] = ..., compressed_longest_path_steps: _Optional[int] = ..., shortest_longest_edit_distance: _Optional[int] = ..., longest_path_timed_out: _Optional[int] = ..., reachable_bounding_box_minor_axis_length: _Optional[int] = ..., unreachable_tile_count: _Optional[int] = ..., solution_bounding_box_minor_axis_length: _Optional[int] = ..., tile_count: _Optional[int] = ..., max_tile_area: _Optional[int] = ..., tiles_not_in_longest_path: _Optional[int] = ..., tiles_in_longest_path_percent: _Optional[int] = ...) -> None: ...
 
 class MazeVariantSpec(_message.Message):
-    __slots__ = ("name", "level_groups")
+    __slots__ = ("name", "level_groups", "metadata")
     NAME_FIELD_NUMBER: _ClassVar[int]
     LEVEL_GROUPS_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     name: str
     level_groups: _containers.RepeatedCompositeFieldContainer[SubVariantSpec]
-    def __init__(self, name: _Optional[str] = ..., level_groups: _Optional[_Iterable[_Union[SubVariantSpec, _Mapping]]] = ...) -> None: ...
+    metadata: VariantMetadata
+    def __init__(self, name: _Optional[str] = ..., level_groups: _Optional[_Iterable[_Union[SubVariantSpec, _Mapping]]] = ..., metadata: _Optional[_Union[VariantMetadata, _Mapping]] = ...) -> None: ...
 
 class SubVariantSpec(_message.Message):
-    __slots__ = ("geometry_name", "level_count")
-    GEOMETRY_NAME_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("geometry_names", "level_count")
+    GEOMETRY_NAMES_FIELD_NUMBER: _ClassVar[int]
     LEVEL_COUNT_FIELD_NUMBER: _ClassVar[int]
-    geometry_name: str
+    geometry_names: _containers.RepeatedScalarFieldContainer[str]
     level_count: int
-    def __init__(self, geometry_name: _Optional[str] = ..., level_count: _Optional[int] = ...) -> None: ...
+    def __init__(self, geometry_names: _Optional[_Iterable[str]] = ..., level_count: _Optional[int] = ...) -> None: ...
+
+class VariantMetadata(_message.Message):
+    __slots__ = ("url_tag", "title_phrase", "you_have_completed_phrase")
+    URL_TAG_FIELD_NUMBER: _ClassVar[int]
+    TITLE_PHRASE_FIELD_NUMBER: _ClassVar[int]
+    YOU_HAVE_COMPLETED_PHRASE_FIELD_NUMBER: _ClassVar[int]
+    url_tag: str
+    title_phrase: str
+    you_have_completed_phrase: str
+    def __init__(self, url_tag: _Optional[str] = ..., title_phrase: _Optional[str] = ..., you_have_completed_phrase: _Optional[str] = ...) -> None: ...
 
 class LevelBatchConfig(_message.Message):
     __slots__ = ("variants", "geometries", "color_pools")
