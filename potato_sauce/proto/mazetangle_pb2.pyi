@@ -55,12 +55,14 @@ class ParInfo(_message.Message):
     def __init__(self, shortest_path_length: _Optional[int] = ..., longest_path_length: _Optional[int] = ..., shortest_path: _Optional[_Iterable[_Union[_geom_pb2.Gridtangle, _Mapping]]] = ..., longest_path: _Optional[_Iterable[_Union[_geom_pb2.Gridtangle, _Mapping]]] = ...) -> None: ...
 
 class MazeGenConfig(_message.Message):
-    __slots__ = ("scene", "dynamic_colors")
+    __slots__ = ("scene", "dynamic_colors", "difficulty")
     SCENE_FIELD_NUMBER: _ClassVar[int]
     DYNAMIC_COLORS_FIELD_NUMBER: _ClassVar[int]
+    DIFFICULTY_FIELD_NUMBER: _ClassVar[int]
     scene: _mondrian_pb2.SceneSpec
     dynamic_colors: ColorInfo
-    def __init__(self, scene: _Optional[_Union[_mondrian_pb2.SceneSpec, _Mapping]] = ..., dynamic_colors: _Optional[_Union[ColorInfo, _Mapping]] = ...) -> None: ...
+    difficulty: str
+    def __init__(self, scene: _Optional[_Union[_mondrian_pb2.SceneSpec, _Mapping]] = ..., dynamic_colors: _Optional[_Union[ColorInfo, _Mapping]] = ..., difficulty: _Optional[str] = ...) -> None: ...
 
 class ColorInfo(_message.Message):
     __slots__ = ("current_node_color", "path_color", "tile_colors", "border_color", "invalid_move_base_color", "invalid_move_highlight_color", "goal_color_cycle", "splash_text_color", "splash_box_color")

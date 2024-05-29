@@ -84,6 +84,7 @@ message MazeGenConfig {
   // SceneSpec, but colors that change at runtime are configured by
   // dynamic_colors.
   ColorInfo dynamic_colors = 2;
+  string difficulty = 3;  // same meaning as in Maze.difficulty
 }
 
 // A color scheme for a mazetangle level. Used both for level generation and at
