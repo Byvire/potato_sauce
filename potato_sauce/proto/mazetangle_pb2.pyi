@@ -9,7 +9,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Maze(_message.Message):
-    __slots__ = ("rects", "background", "start", "goal", "bounding_box", "par_info", "color", "colorblind_background", "colorblind_color", "quality")
+    __slots__ = ("rects", "background", "start", "goal", "bounding_box", "par_info", "color", "colorblind_background", "colorblind_color", "quality", "difficulty")
     RECTS_FIELD_NUMBER: _ClassVar[int]
     BACKGROUND_FIELD_NUMBER: _ClassVar[int]
     START_FIELD_NUMBER: _ClassVar[int]
@@ -20,6 +20,7 @@ class Maze(_message.Message):
     COLORBLIND_BACKGROUND_FIELD_NUMBER: _ClassVar[int]
     COLORBLIND_COLOR_FIELD_NUMBER: _ClassVar[int]
     QUALITY_FIELD_NUMBER: _ClassVar[int]
+    DIFFICULTY_FIELD_NUMBER: _ClassVar[int]
     rects: _containers.RepeatedCompositeFieldContainer[_geom_pb2.Gridtangle]
     background: Graphic
     start: _geom_pb2.Gridtangle
@@ -30,7 +31,8 @@ class Maze(_message.Message):
     colorblind_background: Graphic
     colorblind_color: ColorInfo
     quality: MazeQuality
-    def __init__(self, rects: _Optional[_Iterable[_Union[_geom_pb2.Gridtangle, _Mapping]]] = ..., background: _Optional[_Union[Graphic, _Mapping]] = ..., start: _Optional[_Union[_geom_pb2.Gridtangle, _Mapping]] = ..., goal: _Optional[_Union[_geom_pb2.Gridtangle, _Mapping]] = ..., bounding_box: _Optional[_Union[_geom_pb2.Gridtangle, _Mapping]] = ..., par_info: _Optional[_Union[ParInfo, _Mapping]] = ..., color: _Optional[_Union[ColorInfo, _Mapping]] = ..., colorblind_background: _Optional[_Union[Graphic, _Mapping]] = ..., colorblind_color: _Optional[_Union[ColorInfo, _Mapping]] = ..., quality: _Optional[_Union[MazeQuality, _Mapping]] = ...) -> None: ...
+    difficulty: str
+    def __init__(self, rects: _Optional[_Iterable[_Union[_geom_pb2.Gridtangle, _Mapping]]] = ..., background: _Optional[_Union[Graphic, _Mapping]] = ..., start: _Optional[_Union[_geom_pb2.Gridtangle, _Mapping]] = ..., goal: _Optional[_Union[_geom_pb2.Gridtangle, _Mapping]] = ..., bounding_box: _Optional[_Union[_geom_pb2.Gridtangle, _Mapping]] = ..., par_info: _Optional[_Union[ParInfo, _Mapping]] = ..., color: _Optional[_Union[ColorInfo, _Mapping]] = ..., colorblind_background: _Optional[_Union[Graphic, _Mapping]] = ..., colorblind_color: _Optional[_Union[ColorInfo, _Mapping]] = ..., quality: _Optional[_Union[MazeQuality, _Mapping]] = ..., difficulty: _Optional[str] = ...) -> None: ...
 
 class Graphic(_message.Message):
     __slots__ = ("img_path", "bottom_left")
@@ -61,7 +63,7 @@ class MazeGenConfig(_message.Message):
     def __init__(self, scene: _Optional[_Union[_mondrian_pb2.SceneSpec, _Mapping]] = ..., dynamic_colors: _Optional[_Union[ColorInfo, _Mapping]] = ...) -> None: ...
 
 class ColorInfo(_message.Message):
-    __slots__ = ("current_node_color", "path_color", "tile_colors", "border_color", "invalid_move_base_color", "invalid_move_highlight_color", "goal_color_cycle")
+    __slots__ = ("current_node_color", "path_color", "tile_colors", "border_color", "invalid_move_base_color", "invalid_move_highlight_color", "goal_color_cycle", "splash_text_color", "splash_box_color")
     CURRENT_NODE_COLOR_FIELD_NUMBER: _ClassVar[int]
     PATH_COLOR_FIELD_NUMBER: _ClassVar[int]
     TILE_COLORS_FIELD_NUMBER: _ClassVar[int]
@@ -69,6 +71,8 @@ class ColorInfo(_message.Message):
     INVALID_MOVE_BASE_COLOR_FIELD_NUMBER: _ClassVar[int]
     INVALID_MOVE_HIGHLIGHT_COLOR_FIELD_NUMBER: _ClassVar[int]
     GOAL_COLOR_CYCLE_FIELD_NUMBER: _ClassVar[int]
+    SPLASH_TEXT_COLOR_FIELD_NUMBER: _ClassVar[int]
+    SPLASH_BOX_COLOR_FIELD_NUMBER: _ClassVar[int]
     current_node_color: str
     path_color: str
     tile_colors: _containers.RepeatedScalarFieldContainer[str]
@@ -76,7 +80,9 @@ class ColorInfo(_message.Message):
     invalid_move_base_color: str
     invalid_move_highlight_color: str
     goal_color_cycle: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, current_node_color: _Optional[str] = ..., path_color: _Optional[str] = ..., tile_colors: _Optional[_Iterable[str]] = ..., border_color: _Optional[str] = ..., invalid_move_base_color: _Optional[str] = ..., invalid_move_highlight_color: _Optional[str] = ..., goal_color_cycle: _Optional[_Iterable[str]] = ...) -> None: ...
+    splash_text_color: str
+    splash_box_color: str
+    def __init__(self, current_node_color: _Optional[str] = ..., path_color: _Optional[str] = ..., tile_colors: _Optional[_Iterable[str]] = ..., border_color: _Optional[str] = ..., invalid_move_base_color: _Optional[str] = ..., invalid_move_highlight_color: _Optional[str] = ..., goal_color_cycle: _Optional[_Iterable[str]] = ..., splash_text_color: _Optional[str] = ..., splash_box_color: _Optional[str] = ...) -> None: ...
 
 class ColorPool(_message.Message):
     __slots__ = ("name", "palettes", "defaults")
@@ -219,12 +225,14 @@ class MazeVariantSpec(_message.Message):
     def __init__(self, name: _Optional[str] = ..., level_groups: _Optional[_Iterable[_Union[SubVariantSpec, _Mapping]]] = ..., metadata: _Optional[_Union[VariantMetadata, _Mapping]] = ...) -> None: ...
 
 class SubVariantSpec(_message.Message):
-    __slots__ = ("geometry_names", "level_count")
+    __slots__ = ("geometry_names", "level_count", "difficulty")
     GEOMETRY_NAMES_FIELD_NUMBER: _ClassVar[int]
     LEVEL_COUNT_FIELD_NUMBER: _ClassVar[int]
+    DIFFICULTY_FIELD_NUMBER: _ClassVar[int]
     geometry_names: _containers.RepeatedScalarFieldContainer[str]
     level_count: int
-    def __init__(self, geometry_names: _Optional[_Iterable[str]] = ..., level_count: _Optional[int] = ...) -> None: ...
+    difficulty: str
+    def __init__(self, geometry_names: _Optional[_Iterable[str]] = ..., level_count: _Optional[int] = ..., difficulty: _Optional[str] = ...) -> None: ...
 
 class VariantMetadata(_message.Message):
     __slots__ = ("url_tag", "title_phrase", "you_have_completed_phrase")

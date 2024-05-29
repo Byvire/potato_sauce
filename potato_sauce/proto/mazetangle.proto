@@ -29,6 +29,9 @@ message Maze {
   ColorInfo colorblind_color = 9;
   // Metrics used to determine whether this maze is interesting.
   MazeQuality quality = 10;
+  // User-visible description of how difficult the maze is supposed to be.
+  // Stylized in lowercase, as a single word.
+  string difficulty = 11;
 }
 
 // // Subjective measure of the difficulty of the maze.
@@ -86,8 +89,9 @@ message MazeGenConfig {
 // A color scheme for a mazetangle level. Used both for level generation and at
 // runtime.
 message ColorInfo {
-  // All colors should be in the format "#12abef". Some colors are passed
-  // through verbatim to the JS layer, and others are interpreted by Python.
+  // All colors should be in the format "#12abef" (rgb) or "#12abefaa" (rgba).
+  // Some colors are passed through verbatim to the JS layer, and others are
+  // interpreted by Python.
 
   // Color of the rectangle where the player currently is.
   string current_node_color = 1;
@@ -109,6 +113,11 @@ message ColorInfo {
   // TODO: The color-changing goal tile is no longer implemented in the JS
   // game, so this should be replaced with a singular goal_color field.
   repeated string goal_color_cycle = 7;
+  // Color of text to be overlayed on the level.
+  string splash_text_color = 8;
+  // Background box color for text that gets overlayed on the level. (Alpha is
+  // recommended.)
+  string splash_box_color = 9;
 }
 
 // A group of color palettes that can be used for the same type of level.
@@ -278,11 +287,10 @@ message SubVariantSpec {
   repeated string geometry_names = 1;
   // Number of levels to create.
   int32 level_count = 2;
-  // // Optional short description that displays to the user when they load a maze.
+  // // Short description that displays to the user when they load a maze.
   // // Suggested values are "beginner", "intermediate", and "expert", to reassure
   // // the user the experience they're having is normal.
-  // // TODO: Where should this be? I think on the geometry level is best
-  // string description = 3;
+  string difficulty = 3;
 }
 
 // Information about a level variant, to help the JS game/site display
