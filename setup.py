@@ -5,7 +5,7 @@ setup(
     version='1.0',
     description='Dependency-light python libraries for general use in Prize Potato projects',
     author='Oliver Kisielius',
-    packages=['potato_sauce'],
+    packages=['potato_sauce', 'potato_sauce.proto'],
     install_requires=[
         'protobuf',
     ],
