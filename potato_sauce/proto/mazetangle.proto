@@ -206,6 +206,7 @@ message MazeFilter {
     // - 2 * len(longest_common_subsequence(shortest, longest))
     SHORTEST_LONGEST_EDIT_DISTANCE = 5;
     // 1 if longest path computation timed out, 0 if not.
+    // (Filtered <1 by default.)
     LONGEST_PATH_TIMED_OUT = 6;
     // min(width, height) of the bounding box containing all reachable tiles.
     REACHABLE_BOUNDING_BOX_MINOR_AXIS_LENGTH = 7;
@@ -224,7 +225,11 @@ message MazeFilter {
     // Percent of tiles that are in the longest path (including start and goal),
     // rounded down to the nearest percent. (Value from 0 to 100.)
     TILES_IN_LONGEST_PATH_PERCENT = 13;
-
+    // Number of legal moves, in the whole game graph, from one tile to another
+    // that appear to be just barely not touching.
+    // (E.g. orig.top_left + (1, 2) == dest.bottom_right)
+    // (Auto-filtered by default.)
+    CONFUSING_CORNER_CONNECTIONS = 14;
     // TODO: Add a quality metric to detect if a mindless Zamboni strategy can
     // solve the level. Those levels make me irrationally angry.
   }
@@ -263,6 +268,7 @@ message MazeQuality {
   int32 max_tile_area = 11;
   int32 tiles_not_in_longest_path = 12;
   int32 tiles_in_longest_path_percent = 13;
+  int32 confusing_corner_connections = 14;
 }
 
 // Configuration for one of the user-visible categories of mazetangle levels, ie

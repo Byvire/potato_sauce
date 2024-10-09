@@ -152,6 +152,7 @@ class MazeFilter(_message.Message):
         MAX_TILE_AREA: _ClassVar[MazeFilter.Quantity]
         TILES_NOT_IN_LONGEST_PATH: _ClassVar[MazeFilter.Quantity]
         TILES_IN_LONGEST_PATH_PERCENT: _ClassVar[MazeFilter.Quantity]
+        CONFUSING_CORNER_CONNECTIONS: _ClassVar[MazeFilter.Quantity]
     QUANTITY_UNKNOWN: MazeFilter.Quantity
     SHORTEST_PATH_STEPS: MazeFilter.Quantity
     COMPRESSED_SHORTEST_PATH_STEPS: MazeFilter.Quantity
@@ -166,6 +167,7 @@ class MazeFilter(_message.Message):
     MAX_TILE_AREA: MazeFilter.Quantity
     TILES_NOT_IN_LONGEST_PATH: MazeFilter.Quantity
     TILES_IN_LONGEST_PATH_PERCENT: MazeFilter.Quantity
+    CONFUSING_CORNER_CONNECTIONS: MazeFilter.Quantity
     class Relation(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         RELATION_UNKNOWN: _ClassVar[MazeFilter.Relation]
@@ -187,7 +189,7 @@ class MazeFilter(_message.Message):
     def __init__(self, quantity: _Optional[_Union[MazeFilter.Quantity, str]] = ..., relation: _Optional[_Union[MazeFilter.Relation, str]] = ..., value: _Optional[int] = ..., action: _Optional[_Union[MazeFilter.Action, str]] = ..., priority: _Optional[int] = ...) -> None: ...
 
 class MazeQuality(_message.Message):
-    __slots__ = ("shortest_path_steps", "compressed_shortest_path_steps", "longest_path_steps", "compressed_longest_path_steps", "shortest_longest_edit_distance", "longest_path_timed_out", "reachable_bounding_box_minor_axis_length", "unreachable_tile_count", "solution_bounding_box_minor_axis_length", "tile_count", "max_tile_area", "tiles_not_in_longest_path", "tiles_in_longest_path_percent")
+    __slots__ = ("shortest_path_steps", "compressed_shortest_path_steps", "longest_path_steps", "compressed_longest_path_steps", "shortest_longest_edit_distance", "longest_path_timed_out", "reachable_bounding_box_minor_axis_length", "unreachable_tile_count", "solution_bounding_box_minor_axis_length", "tile_count", "max_tile_area", "tiles_not_in_longest_path", "tiles_in_longest_path_percent", "confusing_corner_connections")
     SHORTEST_PATH_STEPS_FIELD_NUMBER: _ClassVar[int]
     COMPRESSED_SHORTEST_PATH_STEPS_FIELD_NUMBER: _ClassVar[int]
     LONGEST_PATH_STEPS_FIELD_NUMBER: _ClassVar[int]
@@ -201,6 +203,7 @@ class MazeQuality(_message.Message):
     MAX_TILE_AREA_FIELD_NUMBER: _ClassVar[int]
     TILES_NOT_IN_LONGEST_PATH_FIELD_NUMBER: _ClassVar[int]
     TILES_IN_LONGEST_PATH_PERCENT_FIELD_NUMBER: _ClassVar[int]
+    CONFUSING_CORNER_CONNECTIONS_FIELD_NUMBER: _ClassVar[int]
     shortest_path_steps: int
     compressed_shortest_path_steps: int
     longest_path_steps: int
@@ -214,7 +217,8 @@ class MazeQuality(_message.Message):
     max_tile_area: int
     tiles_not_in_longest_path: int
     tiles_in_longest_path_percent: int
-    def __init__(self, shortest_path_steps: _Optional[int] = ..., compressed_shortest_path_steps: _Optional[int] = ..., longest_path_steps: _Optional[int] = ..., compressed_longest_path_steps: _Optional[int] = ..., shortest_longest_edit_distance: _Optional[int] = ..., longest_path_timed_out: _Optional[int] = ..., reachable_bounding_box_minor_axis_length: _Optional[int] = ..., unreachable_tile_count: _Optional[int] = ..., solution_bounding_box_minor_axis_length: _Optional[int] = ..., tile_count: _Optional[int] = ..., max_tile_area: _Optional[int] = ..., tiles_not_in_longest_path: _Optional[int] = ..., tiles_in_longest_path_percent: _Optional[int] = ...) -> None: ...
+    confusing_corner_connections: int
+    def __init__(self, shortest_path_steps: _Optional[int] = ..., compressed_shortest_path_steps: _Optional[int] = ..., longest_path_steps: _Optional[int] = ..., compressed_longest_path_steps: _Optional[int] = ..., shortest_longest_edit_distance: _Optional[int] = ..., longest_path_timed_out: _Optional[int] = ..., reachable_bounding_box_minor_axis_length: _Optional[int] = ..., unreachable_tile_count: _Optional[int] = ..., solution_bounding_box_minor_axis_length: _Optional[int] = ..., tile_count: _Optional[int] = ..., max_tile_area: _Optional[int] = ..., tiles_not_in_longest_path: _Optional[int] = ..., tiles_in_longest_path_percent: _Optional[int] = ..., confusing_corner_connections: _Optional[int] = ...) -> None: ...
 
 class MazeVariantSpec(_message.Message):
     __slots__ = ("name", "level_groups", "metadata")
