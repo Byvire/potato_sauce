@@ -126,9 +126,9 @@ def _naive_longest_simple_path_impl(
     return best_path
 
 
-def _graph_without_node(remove: T,
-                        graph: Mapping[T, set[T]],
-                        leave_node: bool = False) -> dict[T, set[T]]:
+def graph_without_node(remove: T,
+                       graph: Mapping[T, set[T]],
+                       leave_node: bool = False) -> dict[T, set[T]]:
     """A shallow-ish copy of the graph with the given node removed.
 
     If leave_node, only remove the edges to/from the node but leave the node in
@@ -174,7 +174,7 @@ def _compute_node_bottlesets(
             continue
         result[bottleneck] = can_reach_goal.difference(
             nodes_reachable_from(
-                goal, _graph_without_node(bottleneck, reversed_graph, True)),
+                goal, graph_without_node(bottleneck, reversed_graph, True)),
             {bottleneck})
     assert result[goal] == can_reach_goal.difference({goal})
 

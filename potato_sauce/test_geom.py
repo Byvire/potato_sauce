@@ -59,6 +59,29 @@ class GeometryTestCase(absltest.TestCase):
     def test_solve_quadratic_two_solutions(self):
         self.assertEqual(sorted(geom.solve_quadratic(1, 0, -4)), [-2, 2])
 
+    def test_line_intersection_parallel(self):
+        self.assertIsNone(geom.line_intersection(
+            geom.Point(0, 5), geom.Vector(1, 2),
+            geom.Point(-5, 10), geom.Vector(2, 4)))
+
+    def test_line_intersection_horizontal_and_vertical(self):
+        self.assertEqual(geom.line_intersection(
+            geom.Point(-3, -5), geom.Vector(4.5, 0),
+            geom.Point(7, 8), geom.Vector(0, 6.3)),
+                         geom.Point(7, -5))
+
+    def test_line_intersection_vertical_and_horizontal(self):
+        self.assertEqual(geom.line_intersection(
+            geom.Point(7, 8), geom.Vector(0, 6.4),
+            geom.Point(-3, -5), geom.Vector(4.5, 0)),
+                         geom.Point(7, -5))
+
+    def test_line_intersection_diagonalwise(self):
+        self.assertEqual(geom.line_intersection(
+            geom.Point(7, 8), geom.Vector(1, 2),
+            geom.Point(11, 8), geom.Vector(-1, 2)),
+                         geom.Point(9, 12))
+
     def test_circle_intersections_circles_too_far_away(self):
         alice = geom.Circle(geom.Point(1, 2), 10)
         bob = geom.Circle(geom.Point(100, -100), 50)

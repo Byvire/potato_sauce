@@ -178,6 +178,25 @@ def solve_quadratic(a: float, b: float, c: float) -> list[float]:
     return [(-b + det**0.5) / (2 * a), (-b - det**0.5) / (2 * a)]
 
 
+def line_intersection(point0: Point,
+                      vect0: Vector,
+                      point1: Point,
+                      vect1: Vector) -> Optional[Point]:
+    """Finds the intersection of two lines if it exists uniquely.
+
+    point0 and vect0 define the first line, and point1 and vect1 define the
+    second line.
+
+    Not numerically stable.
+    """
+    if vect0.x * vect1.y - vect0.y * vect1.x == 0:  # parallel vectors
+        return None
+    # Solve:  point0 + coeff0 * vect0 == point1 + coeff1 * vect1
+    coeff0 = - ((point0.y - point1.y) * vect1.x - (point0.x - point1.x) * vect1.y
+                ) / (vect0.y * vect1.x - vect0.x * vect1.y)
+    return vect0.scale(coeff0) + point0
+
+
 class Circle:
     def __init__(self, center: Point, radius: float):
         self._center = center
